@@ -16,14 +16,14 @@ public class LocationService {
     protected static Map<Integer, Function<Double, Double>> calculatePercentage = new HashMap<>();
 
     public LocationService() {
-        calculatePercentage.put(2, (x) -> calculate2(x));
-        calculatePercentage.put(3, (x) -> calculate2(x));
-        calculatePercentage.put(4, (x) -> calculate2(x));
-        calculatePercentage.put(5, (x) -> calculate2(x));
+        calculatePercentage.put(2, this::calculate2);
+        calculatePercentage.put(3, this::calculate3);
+        calculatePercentage.put(4, this::calculate4);
+        calculatePercentage.put(5, this::calculate5);
     }
 
     public Location locationMovie(User user, List<Movie> movies) throws MovieWithoutStockException, LocadoraException {
-        verifyInitial(user, movies);
+        this.verifyInitial(user, movies);
 
         Location location = new Location();
         location.setFilmes(movies);
@@ -36,7 +36,7 @@ public class LocationService {
             }
             Movie movie = movies.get(i);
             Double movieValue = movie.getPrecoLocacao();
-            movieValue = calculatePercentage.getOrDefault(i, null).apply(movieValue);
+            movieValue = calculatePercentage.getOrDefault(i, (x) -> movie.getPrecoLocacao()).apply(movieValue);
             valorTotal += movieValue;
         }
         location.setValor(valorTotal);

@@ -2,16 +2,11 @@ package com.msilva.servicos;
 
 
 
-import static com.msilva.utils.DataUtils.isMesmaData;
-import static com.msilva.utils.DataUtils.obterDataComDiferencaDias;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
+import com.msilva.entities.Location;
+import com.msilva.entities.Movie;
+import com.msilva.entities.User;
+import com.msilva.exceptions.LocadoraException;
+import com.msilva.exceptions.MovieWithoutStockException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,15 +14,19 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
-import com.msilva.entities.Movie;
-import com.msilva.entities.Location;
-import com.msilva.entities.User;
-import com.msilva.exceptions.MovieWithoutStockException;
-import com.msilva.exceptions.LocadoraException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import static com.msilva.utils.DataUtils.isMesmaData;
+import static com.msilva.utils.DataUtils.obterDataComDiferencaDias;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class LocationServiceTest {
 
-	private LocacaoService service;
+	private LocationService service;
 	
 	@Rule
 	public ErrorCollector error = new ErrorCollector();
@@ -37,17 +36,17 @@ public class LocationServiceTest {
 	
 	@Before
 	public void setup(){
-		service = new LocacaoService();
+		service = new LocationService();
 	}
 	
 	@Test
-	public void deveAlugarFilme() throws Exception {
+	public void develocationMovie() throws Exception {
 		//cenario
 		User user = new User("Usuario 1");
 		List<Movie> movies = Arrays.asList(new Movie("Filme 1", 1, 5.0));
 		
 		//acao
-		Location location = service.alugarFilme(user, movies);
+		Location location = service.locationMovie(user, movies);
 			
 		//verificacao
 		error.checkThat(location.getValor(), is(equalTo(5.0)));
@@ -56,39 +55,39 @@ public class LocationServiceTest {
 	}
 	
 	@Test(expected = MovieWithoutStockException.class)
-	public void naoDeveAlugarFilmeSemEstoque() throws Exception{
+	public void naoDevelocationMovieSemEstoque() throws Exception{
 		//cenario
 		User user = new User("Usuario 1");
 		List<Movie> movies = Arrays.asList(new Movie("Filme 1", 0, 4.0));
 		
 		//acao
-		service.alugarFilme(user, movies);
+		service.locationMovie(user, movies);
 	}
 	
 	@Test
-	public void naoDeveAlugarFilmeSemUsuario() throws MovieWithoutStockException {
+	public void naoDevelocationMovieSemUsuario() throws MovieWithoutStockException {
 		//cenario
 		List<Movie> movies = Arrays.asList(new Movie("Filme 1", 1, 5.0));
 		
 		//acao
 		try {
-			service.alugarFilme(null, movies);
+			service.locationMovie(null, movies);
 			Assert.fail();
 		} catch (LocadoraException e) {
-			assertThat(e.getMessage(), is("Usuario vazio"));
+			assertThat(e.getMessage(), is("Empty user"));
 		}
 	}
 
 	@Test
-	public void naoDeveAlugarFilmeSemFilme() throws MovieWithoutStockException, LocadoraException{
+	public void naoDevelocationMovieSemFilme() throws MovieWithoutStockException, LocadoraException{
 		//cenario
 		User user = new User("Usuario 1");
 		
 		exception.expect(LocadoraException.class);
-		exception.expectMessage("Filme vazio");
+		exception.expectMessage("Movie empty");
 		
 		//acao
-		service.alugarFilme(user, null);
+		service.locationMovie(user, null);
 	}
 	
 	@Test
@@ -98,7 +97,7 @@ public class LocationServiceTest {
 		List<Movie> movies = Arrays.asList(new Movie("Filme 1", 2, 4.0), new Movie("Filme 2", 2, 4.0), new Movie("Filme 3", 2, 4.0));
 		
 		//acao
-		Location resultado = service.alugarFilme(user, movies);
+		Location resultado = service.locationMovie(user, movies);
 		
 		//verificacao
 		assertThat(resultado.getValor(), is(11.0));
@@ -113,7 +112,7 @@ public class LocationServiceTest {
 				new Movie("Filme 1", 2, 4.0), new Movie("Filme 2", 2, 4.0), new Movie("Filme 3", 2, 4.0), new Movie("Filme 4", 2, 4.0));
 		
 		//acao
-		Location resultado = service.alugarFilme(user, movies);
+		Location resultado = service.locationMovie(user, movies);
 		
 		//verificacao
 		assertThat(resultado.getValor(), is(13.0));
@@ -130,7 +129,7 @@ public class LocationServiceTest {
 				new Movie("Filme 5", 2, 4.0));
 		
 		//acao
-		Location resultado = service.alugarFilme(user, movies);
+		Location resultado = service.locationMovie(user, movies);
 		
 		//verificacao
 		assertThat(resultado.getValor(), is(14.0));
@@ -147,7 +146,7 @@ public class LocationServiceTest {
 				new Movie("Filme 5", 2, 4.0), new Movie("Filme 6", 2, 4.0));
 		
 		//acao
-		Location resultado = service.alugarFilme(user, movies);
+		Location resultado = service.locationMovie(user, movies);
 		
 		//verificacao
 		assertThat(resultado.getValor(), is(14.0));
